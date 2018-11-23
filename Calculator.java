@@ -32,55 +32,40 @@ public class Counter {
         // and rewrite string do not including last finding brackets
         // and call to calculating method with expression inside brackets
     private void removeBrackets(StringBuilder string){
-        int openBracketIndex;
-        int startBracketExpression ;
-        int closeBracketIndex;
-        int endBracketExpression;
-
+       
             if (string.indexOf(")") < 0) {
-                openBracketIndex = string.lastIndexOf("(");
-                startBracketExpression = openBracketIndex;
-                string.replace(openBracketIndex, string.length(), calculateExpression(string.substring(startBracketExpression)));
+                string.replace(string.lastIndexOf("("), string.length(), calculateExpression(string.substring(string.lastIndexOf("("))));
             }
             if (string.indexOf(")") > 0) {
-                openBracketIndex = string.lastIndexOf("(");
-                startBracketExpression = openBracketIndex;
-                closeBracketIndex = string.indexOf(")",startBracketExpression);
-                endBracketExpression = closeBracketIndex;
-                string.replace(openBracketIndex, closeBracketIndex, calculateExpression(string.substring(startBracketExpression, endBracketExpression)));
+                string.replace(string.lastIndexOf("("), string.indexOf(")",string.lastIndexOf("(")), calculateExpression(string.substring(string.lastIndexOf("("), string.indexOf(")",string.lastIndexOf("(")))));
             }
 
     }
-    
-    // analyze array with parsed expressions elements.
-    // if element has "* or /", then neighborhood element 
+
+    // analyze array with parsed expressions.
+    // if expression has "* or /" neighborhood expressions
     // multiplied||divided without "*/" and
     // they removed from array
     // if expression does not contain *||/, all elements of the array just += with next element
     public String calculateExpression(String expression){
+        double result = 0;
 
         List<String> collection = parsedStringArray(expression);
-        String multiply;
-        String divide;
-        double result = 0;
 
         for (int i = 0; i < collection.size(); i++) {
             if (collection.get(i).contains("*")){
-                multiply = String.valueOf(Double.parseDouble(collection.get(i-1))*Double.parseDouble(collection.get(i).substring(1)));
-                collection.set(i-1, multiply);
+                collection.set(i-1, String.valueOf(Double.parseDouble(collection.get(i-1))*Double.parseDouble(collection.get(i).substring(1))));
                 collection.remove(i);
                 --i;
 
             } else if (collection.get(i).contains("/")){
-                divide = String.valueOf(Double.parseDouble(collection.get(i-1))/Double.parseDouble(collection.get(i).substring(1)));
-                collection.set(i-1, divide);
+                collection.set(i-1, String.valueOf(Double.parseDouble(collection.get(i-1))/Double.parseDouble(collection.get(i).substring(1))));
                 collection.remove(i);
                 --i;
             }
         }
         for (String str : collection) {
             result += Double.parseDouble(str);
-
         }
         collection.clear();
 
