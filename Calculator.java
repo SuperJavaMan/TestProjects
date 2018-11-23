@@ -1,3 +1,5 @@
+package sample;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,16 +33,14 @@ public class Counter {
         // search first ")" from last "("
         // and rewrite string do not including last finding brackets
         // and call to calculating method with expression inside brackets
-    private void removeBrackets(StringBuilder string){
-       
+        private void removeBrackets(StringBuilder string) {
+            int openBracketIndex = string.lastIndexOf("(");
             if (string.indexOf(")") < 0) {
-                string.replace(string.lastIndexOf("("), string.length(), calculateExpression(string.substring(string.lastIndexOf("("))));
+                string.replace(openBracketIndex, string.length(), calculateExpression(string.substring(openBracketIndex)));
+            } else {
+                string.replace(openBracketIndex, string.indexOf(")", openBracketIndex), calculateExpression(string.substring(openBracketIndex, string.indexOf(")", openBracketIndex))));
             }
-            if (string.indexOf(")") > 0) {
-                string.replace(string.lastIndexOf("("), string.indexOf(")",string.lastIndexOf("(")), calculateExpression(string.substring(string.lastIndexOf("("), string.indexOf(")",string.lastIndexOf("(")))));
-            }
-
-    }
+        }
 
     // analyze array with parsed expressions.
     // if expression has "* or /" neighborhood expressions
@@ -48,27 +48,32 @@ public class Counter {
     // they removed from array
     // if expression does not contain *||/, all elements of the array just += with next element
     public String calculateExpression(String expression){
-        double result = 0;
 
         List<String> collection = parsedStringArray(expression);
+        String multiply;
+        String divide;
+        double result = 0;
 
         for (int i = 0; i < collection.size(); i++) {
             if (collection.get(i).contains("*")){
-                collection.set(i-1, String.valueOf(Double.parseDouble(collection.get(i-1))*Double.parseDouble(collection.get(i).substring(1))));
+                multiply = String.valueOf(Double.parseDouble(collection.get(i-1))*Double.parseDouble(collection.get(i).substring(1)));
+                collection.set(i-1, multiply);
                 collection.remove(i);
                 --i;
 
             } else if (collection.get(i).contains("/")){
-                collection.set(i-1, String.valueOf(Double.parseDouble(collection.get(i-1))/Double.parseDouble(collection.get(i).substring(1))));
+                divide = String.valueOf(Double.parseDouble(collection.get(i-1))/Double.parseDouble(collection.get(i).substring(1)));
+                collection.set(i-1, divide);
                 collection.remove(i);
                 --i;
             }
         }
         for (String str : collection) {
             result += Double.parseDouble(str);
-        }
+            }
         collection.clear();
 
         return String.valueOf(result);
     }
 }
+
