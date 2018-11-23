@@ -1,75 +1,89 @@
-package sample;
-
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.Collection;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 public class Counter {
+            // analyze if an expression contains bracket and call to needed method
+    public StringBuilder analyzeExpression(StringBuilder string){
 
-    String numbers = "-3*33/95+75.356+95+23.2345+89-89+52-3/33*95";
+        while (string.indexOf("(") >= 0){
+            removeBrackets(string);      // remove all brackets and calculate expression
+        }
+        string.replace(0, string.length(), calculateExpression(string.toString())); // just remove old string and write a new calculated one
 
+        return string; // return calculated string to display
+    }
 
-    public String parsingString(String parsingString){
-        String multiply = "";
-        String divide = "";
-        double result = 0;
-        ArrayList<String> elements = new ArrayList<>();
+        // parse string for sight and number, and return string array of these
+    private List<String> parsedStringArray(String string){
+        List<String> elements = new ArrayList<>();
 
         Pattern pattern = Pattern.compile("[+\\-*/]?[\\d]+(\\.\\d+)?");
-        Matcher matcher = pattern.matcher(parsingString);
+        Matcher matcher = pattern.matcher(string);
 
         while (matcher.find()){
-            String string = parsingString.substring(matcher.start(), matcher.end());
-            elements.add(string);
+            elements.add(string.substring(matcher.start(), matcher.end()));
         }
+        return elements;
+    }
+        // search first ")" from last "("
+        // and rewrite string do not including last finding brackets
+        // and call to calculating method with expression inside brackets
+    private void removeBrackets(StringBuilder string){
+        int openBracketIndex;
+        int startBracketExpression ;
+        int closeBracketIndex;
+        int endBracketExpression;
 
-        for (int i = 0; i < elements.size(); i++) {
-            if (elements.get(i).indexOf("*") != -1){
-                multiply = String.valueOf(Double.parseDouble(elements.get(i-1))*Double.parseDouble(elements.get(i).substring(1)));
-                elements.set(i-1, multiply);
-                elements.remove(i);
+            if (string.indexOf(")") < 0) {
+                openBracketIndex = string.lastIndexOf("(");
+                startBracketExpression = openBracketIndex;
+                string.replace(openBracketIndex, string.length(), calculateExpression(string.substring(startBracketExpression)));
+            }
+            if (string.indexOf(")") > 0) {
+                openBracketIndex = string.lastIndexOf("(");
+                startBracketExpression = openBracketIndex;
+                closeBracketIndex = string.indexOf(")",startBracketExpression);
+                endBracketExpression = closeBracketIndex;
+                string.replace(openBracketIndex, closeBracketIndex, calculateExpression(string.substring(startBracketExpression, endBracketExpression)));
+            }
+
+    }
+    
+    // analyze array with parsed expressions elements.
+    // if element has "* or /", then neighborhood element 
+    // multiplied||divided without "*/" and
+    // they removed from array
+    // if expression does not contain *||/, all elements of the array just += with next element
+    public String calculateExpression(String expression){
+
+        List<String> collection = parsedStringArray(expression);
+        String multiply;
+        String divide;
+        double result = 0;
+
+        for (int i = 0; i < collection.size(); i++) {
+            if (collection.get(i).contains("*")){
+                multiply = String.valueOf(Double.parseDouble(collection.get(i-1))*Double.parseDouble(collection.get(i).substring(1)));
+                collection.set(i-1, multiply);
+                collection.remove(i);
                 --i;
 
-            } else if (elements.get(i).indexOf("/") != -1){
-                divide = String.valueOf(Double.parseDouble(elements.get(i-1))/Double.parseDouble(elements.get(i).substring(1)));
-                elements.set(i-1, divide);
-                elements.remove(i);
+            } else if (collection.get(i).contains("/")){
+                divide = String.valueOf(Double.parseDouble(collection.get(i-1))/Double.parseDouble(collection.get(i).substring(1)));
+                collection.set(i-1, divide);
+                collection.remove(i);
                 --i;
             }
         }
-        for (String str : elements) {
+        for (String str : collection) {
             result += Double.parseDouble(str);
 
         }
-        elements.clear();
+        collection.clear();
 
         return String.valueOf(result);
-//        return elements.toString();
-//        return elements.get(0);
-
     }
-
-    public String brakets(String expression){
-        String removeBrakets = "Don't work";
-        String minusBraket = "1";
-        String result = "Don't work";
-
-        while (expression.indexOf("(") != -1) {
-            Pattern pattern = Pattern.compile("[(]{1}?[\\-\\d.+\\-*/]*?[)]{1}?");
-            Matcher matcher = pattern.matcher(expression);
-
-            while (matcher.find( )) {
-                removeBrakets = expression.substring(matcher.start( ), matcher.end( ));
-            }
-            minusBraket = removeBrakets.substring(1, removeBrakets.length( ) - 1);
-//            result = parsingString(minusBraket);
-            expression = matcher.replaceAll(parsingString(minusBraket));
-        }
-//        return minusBraket;
-        return parsingString(expression);
-    }
-
 }
